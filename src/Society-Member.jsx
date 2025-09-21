@@ -37,7 +37,7 @@ const SocietyMember = ({ setCurrentPage }) => {
   const [modalType, setModalType] = useState('');
   const [notifications, setNotifications] = useState([
     { id: 1, title: "Tech Workshop Tomorrow", message: "Don't forget about the AI/ML workshop at 2 PM", time: "2 hours ago", type: "reminder", read: false },
-    { id: 2, title: "New Member Joined", message: "Sarah Johnson joined ABC Society", time: "5 hours ago", type: "info", read: false },
+    { id: 2, title: "New Member Joined", message: "Upasna Saxena joined Anveshan Society", time: "5 hours ago", type: "info", read: false },
     { id: 3, title: "Event Certificate Ready", message: "Your Hackathon 2024 certificate is ready for download", time: "1 day ago", type: "achievement", read: true }
   ]);
   
@@ -92,12 +92,12 @@ const SocietyMember = ({ setCurrentPage }) => {
   ];
 
   const members = [
-    { id: 1, name: "Nishtha Sood", email: "soodnishtha@soclique.com", role: "Core Member", department: "CSE", branch: "Computer Science Engineering", society: "ABC Society", status: "Active", joinDate: "2023-08-15" },
-    { id: 2, name: "Aadhya Sharma", email: "aadhya017@example.com", role: "Volunteer", department: "ECE", branch: "Electronics & Communication", society: "ABC Society", status: "Active", joinDate: "2023-09-20" },
-    { id: 3, name: "Mansi Bhandari", email: "mansibhandari9@example.com", role: "Core Member", department: "IT", branch: "Information Technology", society: "ABC Society", status: "Active", joinDate: "2023-07-10" },
-    { id: 4, name: "Arshia Gupta", email: "arshiaa1@example.com", role: "Core Member", department: "CSE", branch: "Computer Science Engineering", society: "ABC Society", status: "Active", joinDate: "2023-10-05" },
-    { id: 5, name: "Janvi Mathur", email: "mathur89@example.com", role: "Junior Council", department: "CSE", branch: "Computer Science Engineering", society: "ABC Society", status: "Active", joinDate: "2023-10-08" },
-    { id: 6, name: "Upasna Saxena", email: "supasna2@example.com", role: "Member", department: "CSE", branch: "Computer Science Engineering", society: "ABC Society", status: "Active", joinDate: "2023-10-09" }
+    { id: 1, name: "Nishtha Sood", email: "soodnishtha@soclique.com", role: "Core Member", department: "CSE", branch: "Computer Science Engineering",semester: "3rd", status: "Active", joinDate: "2023-08-15" },
+    { id: 2, name: "Aadhya Sharma", email: "aadhya017@example.com", role: "Volunteer", department: "ECE", branch: "Electronics & Communication",semester: "3rd", status: "Active", joinDate: "2023-09-20" },
+    { id: 3, name: "Mansi Bhandari", email: "mansibhandari9@example.com", role: "Core Member", department: "IT", branch: "Information Technology",semester: "3rd", status: "Active", joinDate: "2023-07-10" },
+    { id: 4, name: "Arshia Gupta", email: "arshiaa1@example.com", role: "Core Member", department: "CSE", branch: "Computer Science Engineering",semester: "3rd", status: "Active", joinDate: "2023-10-05" },
+    { id: 5, name: "Janvi Mathur", email: "mathur89@example.com", role: "Junior Council", department: "CSE", branch: "Computer Science Engineering",semester: "3rd", status: "Active", joinDate: "2023-10-08" },
+    { id: 6, name: "Upasna Saxena", email: "supasna2@example.com", role: "Member", department: "CSE", branch: "Computer Science Engineering",semester: "3rd", status: "Active", joinDate: "2023-10-09" }
   ];
 
   const aiInsights = {
@@ -421,13 +421,13 @@ const SocietyMember = ({ setCurrentPage }) => {
           <div className="sm-member-column">Email</div>
           <div className="sm-member-column">Branch</div>
           <div className="sm-member-column">Role</div>
-          <div className="sm-member-column">Society</div>
+          <div className="sm-member-column">Semester</div>
           <div className="sm-member-column">Actions</div>
         </div>
         
         {members.map(member => (
           <div key={member.id} className="sm-member-item">
-            <div className="sm-member-column">
+            <div className="sm-member-column"> 
               <div className="sm-member-profile">
                 <div className="sm-member-avatar">
                   {member.name.split(' ').map(n => n[0]).join('')}
@@ -457,7 +457,7 @@ const SocietyMember = ({ setCurrentPage }) => {
             </div>
             
             <div className="sm-member-column">
-              <span className="sm-society-name">{member.society}</span>
+              <span className="sm-society-name">{member.semester}</span>
             </div>
             
             <div className="sm-member-column">
@@ -505,7 +505,7 @@ const SocietyMember = ({ setCurrentPage }) => {
               </div>
               <div className="sm-detail-item">
                 <User size={16} />
-                <span>ABC Society</span>
+                <span> Society</span>
               </div>
             </div>
             <div className="sm-certificate-skills">
@@ -541,7 +541,7 @@ const SocietyMember = ({ setCurrentPage }) => {
               </div>
               <div className="sm-detail-item">
                 <User size={16} />
-                <span>ABC Society</span>
+                <span>Anveshan Society</span>
               </div>
             </div>
             <div className="sm-certificate-skills">
@@ -664,7 +664,7 @@ const SocietyMember = ({ setCurrentPage }) => {
             <ArrowLeft size={22} />
           </button>
           <div className="sm-society-info">
-            <h1>ABC SOCIETY</h1>
+            <h1>ANVESHAN SOCIETY</h1>
             <p>Welcome back, <strong>{memberData.name}</strong> • {memberData.role}</p>
           </div>
         </div>
