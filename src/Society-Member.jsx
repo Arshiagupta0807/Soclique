@@ -22,7 +22,12 @@ import {
   Activity,
   Eye,
   Star,
-  Heart
+  Heart,
+  FileText,
+  Zap,
+  BookOpen,
+  Shield,
+  Coffee
 } from 'lucide-react';
 import './Society-Member.css';
 
@@ -35,19 +40,29 @@ const SocietyMember = ({ setCurrentPage }) => {
     { id: 2, title: "New Member Joined", message: "Sarah Johnson joined ABC Society", time: "5 hours ago", type: "info", read: false },
     { id: 3, title: "Event Certificate Ready", message: "Your Hackathon 2024 certificate is ready for download", time: "1 day ago", type: "achievement", read: true }
   ]);
+  
   const [chatMessages, setChatMessages] = useState([
     { id: 1, user: "AI Assistant", message: "Hello! I'm here to help with society insights and answer your questions.", time: "10:00 AM", isBot: true },
     { id: 2, user: "You", message: "What's my attendance rate?", time: "10:01 AM", isBot: false },
     { id: 3, user: "AI Assistant", message: "Your attendance rate is 87% across all events. You've attended 13 out of 15 events this semester. Great job!", time: "10:01 AM", isBot: true }
   ]);
+  
   const [groupChatMessages, setGroupChatMessages] = useState([
     { id: 1, user: "Nishtha S.", message: "Hey everyone! Ready for tomorrow's workshop?", time: "9:30 AM", isBot: false, avatar: "NS" },
     { id: 2, user: "Aadhya S.", message: "Absolutely! I've prepared some questions about ML algorithms", time: "9:32 AM", isBot: false, avatar: "AS" },
     { id: 3, user: "You", message: "Same here! Can't wait to learn about neural networks", time: "9:35 AM", isBot: false, avatar: "YU" }
   ]);
+  
   const [newMessage, setNewMessage] = useState('');
-  const [certificateStep, setCertificateStep] = useState(1);
-  const [certificateData, setCertificateData] = useState({ event: '', achievements: '' });
+  const [certificateForm, setCertificateForm] = useState({
+    eventTitle: '',
+    participantName: '',
+    dateOfCompletion: '',
+    achievements: '',
+    skillsGained: '',
+    certificateType: 'participation',
+    customMessage: ''
+  });
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -107,8 +122,15 @@ const SocietyMember = ({ setCurrentPage }) => {
     }
     setIsModalOpen(true);
     if (type === 'certificate') {
-      setCertificateStep(1);
-      setCertificateData({ event: '', achievements: '' });
+      setCertificateForm({
+        eventTitle: '',
+        participantName: memberData.name,
+        dateOfCompletion: '',
+        achievements: '',
+        skillsGained: '',
+        certificateType: 'participation',
+        customMessage: ''
+      });
     }
   };
 
@@ -120,11 +142,20 @@ const SocietyMember = ({ setCurrentPage }) => {
     setMessageText('');
     setEventSuggestion('');
     setEventSuggestionCategory('');
+    setCertificateForm({
+      eventTitle: '',
+      participantName: memberData.name,
+      dateOfCompletion: '',
+      achievements: '',
+      skillsGained: '',
+      certificateType: 'participation',
+      customMessage: ''
+    });
   };
 
   const handleSendMessage = (isGroupChat = false, member = null) => {
     if (member && messageText.trim()) {
-      setSuccessMessage(`Message sent to ${member.name}!`);
+      setSuccessMessage(`Message sent to ${member.name} successfully!`);
       setShowSuccess(true);
       setMessageText('');
       closeModal();
@@ -169,20 +200,22 @@ const SocietyMember = ({ setCurrentPage }) => {
   };
 
   const handleGenerateCertificate = () => {
-    if (certificateStep === 1 && certificateData.event) {
-      setCertificateStep(2);
-    } else if (certificateStep === 2 && certificateData.achievements) {
-      setSuccessMessage(`Certificate generated for ${certificateData.event}! Check your downloads.`);
-      setShowSuccess(true);
-      closeModal();
-      setTimeout(() => setShowSuccess(false), 3000);
+    const { eventTitle, participantName, dateOfCompletion, achievements } = certificateForm;
+    if (!eventTitle || !participantName || !dateOfCompletion || !achievements) {
+      alert('Please fill in all required fields');
+      return;
     }
+    
+    setSuccessMessage(`Certificate generated for ${eventTitle}! Check your downloads.`);
+    setShowSuccess(true);
+    closeModal();
+    setTimeout(() => setShowSuccess(false), 3000);
   };
 
   const handleSuggestEvent = () => {
     if (!eventSuggestion.trim() || !eventSuggestionCategory) return;
     
-    setSuccessMessage(`Event suggestion "${eventSuggestion}" submitted successfully!`);
+    setSuccessMessage(`Event suggestion "${eventSuggestion.substring(0, 30)}..." submitted successfully!`);
     setShowSuccess(true);
     setEventSuggestion('');
     setEventSuggestionCategory('');
@@ -211,65 +244,66 @@ const SocietyMember = ({ setCurrentPage }) => {
   }, [isModalOpen]);
 
   const renderDashboard = () => (
-    <div className="member-dashboard-content">
-      <div className="member-stats-grid">
-        <div className="member-stat-card" style={{'--delay': '0s'}}>
-          <div className="member-stat-icon">
-            <Trophy size={24} />
+    <div className="sm-dashboard-content">
+      <div className="sm-stats-grid">
+        <div className="sm-stat-card" style={{'--delay': '0s'}}>
+          <div className="sm-stat-icon">
+            <Trophy size={28} />
           </div>
-          <div className="member-stat-content">
+          <div className="sm-stat-content">
             <h3>{memberData.societyPoints}</h3>
             <p>Society Points</p>
-            <span className="member-stat-change positive">+50 this month</span>
+            <span className="sm-stat-change positive">+50 this month</span>
           </div>
         </div>
         
-        <div className="member-stat-card" style={{'--delay': '0.1s'}}>
-          <div className="member-stat-icon">
-            <Calendar size={24} />
+        <div className="sm-stat-card" style={{'--delay': '0.1s'}}>
+          <div className="sm-stat-icon">
+            <Activity size={28} />
           </div>
-          <div className="member-stat-content">
+          <div className="sm-stat-content">
             <h3>{memberData.attendance}%</h3>
             <p>Attendance Rate</p>
-            <span className="member-stat-change positive">+15% vs last month</span>
+            <span className="sm-stat-change positive">+15% vs last month</span>
           </div>
         </div>
         
-        <div className="member-stat-card" style={{'--delay': '0.2s'}}>
-          <div className="member-stat-icon">
-            <Award size={24} />
+        <div className="sm-stat-card" style={{'--delay': '0.2s'}}>
+          <div className="sm-stat-icon">
+            <Award size={28} />
           </div>
-          <div className="member-stat-content">
+          <div className="sm-stat-content">
             <h3>{memberData.certificatesEarned}</h3>
             <p>Certificates Earned</p>
-            <span className="member-stat-change positive">+2 this month</span>
+            <span className="sm-stat-change positive">+2 this month</span>
           </div>
         </div>
         
-        <div className="member-stat-card" style={{'--delay': '0.3s'}}>
-          <div className="member-stat-icon">
-            <Activity size={24} />
+        <div className="sm-stat-card" style={{'--delay': '0.3s'}}>
+          <div className="sm-stat-icon">
+            <Calendar size={28} />
           </div>
-          <div className="member-stat-content">
+          <div className="sm-stat-content">
             <h3>{memberData.eventsAttended}</h3>
             <p>Events Attended</p>
-            <span className="member-stat-change positive">2 more this month</span>
+            <span className="sm-stat-change positive">2 more this month</span>
           </div>
         </div>
       </div>
 
-      <div className="member-dashboard-grid">
-        <div className="member-dashboard-card" style={{'--delay': '0.4s'}}>
-          <div className="member-card-header">
-            <h3><Brain size={20} /> AI Insights</h3>
-            <button className="member-btn-secondary" onClick={() => openModal('aiInsights')}>
-              View All
+      <div className="sm-dashboard-grid">
+        <div className="sm-dashboard-card" style={{'--delay': '0.4s'}}>
+          <div className="sm-card-header">
+            <h3><Brain size={24} /> AI Insights & Recommendations</h3>
+            <button className="sm-btn-secondary" onClick={() => openModal('aiInsights')}>
+              <Eye size={16} />
+              View Details
             </button>
           </div>
-          <div className="ai-insights-content">
-            <div className="insight-category">
-              <h4><Target size={16} /> Personal Insights</h4>
-              <ul className="insight-list">
+          <div className="sm-ai-insights-content">
+            <div className="sm-insight-category">
+              <h4><Target size={18} /> Personal Performance</h4>
+              <ul className="sm-insight-list">
                 {aiInsights.personal.slice(0, 2).map((insight, index) => (
                   <li key={index}>{insight}</li>
                 ))}
@@ -278,27 +312,27 @@ const SocietyMember = ({ setCurrentPage }) => {
           </div>
         </div>
 
-        <div className="member-dashboard-card" style={{'--delay': '0.5s'}}>
-          <div className="member-card-header">
-            <h3><Calendar size={20} /> Upcoming Events</h3>
-            <button className="member-btn-primary" onClick={() => openModal('certificate')}>
+        <div className="sm-dashboard-card" style={{'--delay': '0.5s'}}>
+          <div className="sm-card-header">
+            <h3><Calendar size={24} /> Upcoming Events</h3>
+            <button className="sm-btn-primary" onClick={() => openModal('certificate')}>
               <Award size={16} />
-              Get Certificate
+              Generate Certificate
             </button>
           </div>
-          <div className="member-events-list">
+          <div className="sm-events-list">
             {events.filter(event => event.status === 'upcoming').slice(0, 3).map(event => (
-              <div key={event.id} className="member-event-item">
-                <div className="member-event-date">
-                  <span className="member-day">{new Date(event.date).getDate()}</span>
-                  <span className="member-month">{new Date(event.date).toLocaleDateString('en', { month: 'short' })}</span>
+              <div key={event.id} className="sm-event-item">
+                <div className="sm-event-date">
+                  <span className="sm-day">{new Date(event.date).getDate()}</span>
+                  <span className="sm-month">{new Date(event.date).toLocaleDateString('en', { month: 'short' })}</span>
                 </div>
-                <div className="member-event-content">
+                <div className="sm-event-content">
                   <h4>{event.title}</h4>
-                  <p><MapPin size={14} /> {event.venue} • {event.time}</p>
-                  <span className="member-attendees">{event.attendees} registered</span>
+                  <p><MapPin size={16} /> {event.venue} • {event.time}</p>
+                  <span className="sm-attendees">{event.attendees} registered</span>
                 </div>
-                {event.hasReminder && <span className="reminder-badge">Reminder Set</span>}
+                {event.hasReminder && <span className="sm-reminder-badge">Reminder Set</span>}
               </div>
             ))}
           </div>
@@ -308,56 +342,56 @@ const SocietyMember = ({ setCurrentPage }) => {
   );
 
   const renderEvents = () => (
-    <div className="member-dashboard-content">
-      <div className="member-content-header">
-        <div className="member-header-left">
+    <div className="sm-dashboard-content">
+      <div className="sm-content-header">
+        <div className="sm-header-left">
           <h2>Society Events</h2>
-          <p>Discover and join exciting society activities</p>
+          <p>Discover and participate in engaging society activities</p>
         </div>
       </div>
 
-      <div className="member-events-grid">
+      <div className="sm-events-grid">
         {events.map(event => (
-          <div key={event.id} className="member-event-card">
-            <div className="member-event-card-header">
+          <div key={event.id} className="sm-event-card">
+            <div className="sm-event-card-header">
               <h3>{event.title}</h3>
-              <span className={`member-event-type ${event.status}`}>
+              <span className={`sm-event-type ${event.status}`}>
                 {event.status}
               </span>
             </div>
-            <div className="member-event-description">
-              Join us for an exciting learning experience in {event.title.toLowerCase()}.
+            <div className="sm-event-description">
+              Join us for an enriching learning experience in {event.title.toLowerCase()}.
             </div>
-            <div className="member-event-details">
-              <div className="member-event-detail">
-                <Calendar size={14} />
+            <div className="sm-event-details">
+              <div className="sm-event-detail">
+                <Calendar size={16} />
                 <span>{new Date(event.date).toLocaleDateString()} at {event.time}</span>
               </div>
-              <div className="member-event-detail">
-                <MapPin size={14} />
+              <div className="sm-event-detail">
+                <MapPin size={16} />
                 <span>{event.venue}</span>
               </div>
-              <div className="member-event-detail">
-                <Users size={14} />
+              <div className="sm-event-detail">
+                <Users size={16} />
                 <span>{event.attendees} attendees</span>
               </div>
             </div>
-            <div className="member-event-card-actions">
+            <div className="sm-event-card-actions">
               {event.status === 'upcoming' && (
                 <button 
-                  className="member-btn-primary"
+                  className="sm-btn-primary"
                   onClick={() => openModal('reminder', event)}
                 >
-                  <Bell size={14} />
+                  <Bell size={16} />
                   Set Reminder
                 </button>
               )}
               {event.status === 'completed' && (
                 <button 
-                  className="member-btn-secondary"
+                  className="sm-btn-secondary"
                   onClick={() => openModal('certificate')}
                 >
-                  <Award size={14} />
+                  <Award size={16} />
                   Get Certificate
                 </button>
               )}
@@ -369,68 +403,70 @@ const SocietyMember = ({ setCurrentPage }) => {
   );
 
   const renderMembers = () => (
-    <div className="member-dashboard-content">
-      <div className="member-content-header">
-        <div className="member-header-left">
+    <div className="sm-dashboard-content">
+      <div className="sm-content-header">
+        <div className="sm-header-left">
           <h2>Society Members</h2>
-          <p>Connect with your fellow society members</p>
+          <p>Connect and collaborate with your fellow society members</p>
         </div>
-        <button className="member-btn-primary" onClick={() => openModal('suggestEvent')}>
+        <button className="sm-btn-primary" onClick={() => openModal('suggestEvent')}>
           <Sparkles size={16} />
           Suggest Event
         </button>
       </div>
 
-      <div className="members-list-container">
-        <div className="members-list-header">
-          <div className="member-list-column">Name</div>
-          <div className="member-list-column">Email</div>
-          <div className="member-list-column">Branch</div>
-          <div className="member-list-column">Role</div>
-          <div className="member-list-column">Society</div>
-          <div className="member-list-column">Actions</div>
+      <div className="sm-members-container">
+        <div className="sm-members-header">
+          <div className="sm-member-column">Member</div>
+          <div className="sm-member-column">Email</div>
+          <div className="sm-member-column">Branch</div>
+          <div className="sm-member-column">Role</div>
+          <div className="sm-member-column">Society</div>
+          <div className="sm-member-column">Actions</div>
         </div>
         
         {members.map(member => (
-          <div key={member.id} className="member-list-item">
-            <div className="member-list-column">
-              <div className="member-name-cell">
-                <div className="member-list-avatar">
+          <div key={member.id} className="sm-member-item">
+            <div className="sm-member-column">
+              <div className="sm-member-profile">
+                <div className="sm-member-avatar">
                   {member.name.split(' ').map(n => n[0]).join('')}
                 </div>
-                <div className="member-name-info">
-                  <span className="member-name">{member.name}</span>
-                  <span className="member-status">{member.status}</span>
+                <div className="sm-member-info">
+                  <span className="sm-member-name">{member.name}</span>
+                  <span className="sm-member-status">{member.status}</span>
                 </div>
               </div>
             </div>
             
-            <div className="member-list-column">
-              <span className="member-email">{member.email}</span>
+            <div className="sm-member-column">
+              <span className="sm-member-email">{member.email}</span>
             </div>
             
-            <div className="member-list-column">
-              <span className="member-branch">{member.branch}</span>
-              <span className="member-department">({member.department})</span>
+            <div className="sm-member-column">
+              <div className="sm-branch-info">
+                <span className="sm-branch-name">{member.branch}</span>
+                <span className="sm-department-tag">({member.department})</span>
+              </div>
             </div>
             
-            <div className="member-list-column">
-              <span className={`member-role-tag ${member.role.toLowerCase().replace(/\s+/g, '-')}`}>
+            <div className="sm-member-column">
+              <span className={`sm-role-tag ${member.role.toLowerCase().replace(/\s+/g, '-')}`}>
                 {member.role}
               </span>
             </div>
             
-            <div className="member-list-column">
-              <span className="member-society">{member.society}</span>
+            <div className="sm-member-column">
+              <span className="sm-society-name">{member.society}</span>
             </div>
             
-            <div className="member-list-column">
+            <div className="sm-member-column">
               <button 
-                className="member-action-btn message-btn"
+                className="sm-action-btn"
                 onClick={() => openModal('sendMessage', member)}
                 title="Send Message"
               >
-                <MessageCircle size={16} />
+                <MessageCircle size={18} />
               </button>
             </div>
           </div>
@@ -440,81 +476,85 @@ const SocietyMember = ({ setCurrentPage }) => {
   );
 
   const renderCertificates = () => (
-    <div className="member-dashboard-content">
-      <div className="member-content-header">
-        <div className="member-header-left">
+    <div className="sm-dashboard-content">
+      <div className="sm-content-header">
+        <div className="sm-header-left">
           <h2>My Certificates</h2>
-          <p>View and download your earned certificates</p>
+          <p>View and manage your earned certificates</p>
         </div>
-        <button className="member-btn-primary" onClick={() => openModal('certificate')}>
+        <button className="sm-btn-primary" onClick={() => openModal('certificate')}>
           <Award size={16} />
-          Generate New
+          Create Certificate
         </button>
       </div>
 
-      <div className="member-certificates-grid">
-        <div className="member-certificate-card">
-          <div className="member-certificate-header">
-            <Award size={24} className="member-certificate-icon" />
-            <span className="member-certificate-badge">Verified</span>
+      <div className="sm-certificates-grid">
+        <div className="sm-certificate-card">
+          <div className="sm-certificate-header">
+            <div className="sm-certificate-icon">
+              <Award size={32} />
+            </div>
+            <span className="sm-certificate-badge verified">Verified</span>
           </div>
-          <div className="member-certificate-content">
+          <div className="sm-certificate-content">
             <h3>Hackathon 2024 Participant</h3>
-            <div className="member-certificate-details">
-              <div className="member-detail-item">
-                <Calendar size={14} />
+            <div className="sm-certificate-details">
+              <div className="sm-detail-item">
+                <Calendar size={16} />
                 <span>December 15, 2023</span>
               </div>
-              <div className="member-detail-item">
-                <User size={14} />
+              <div className="sm-detail-item">
+                <User size={16} />
                 <span>ABC Society</span>
               </div>
             </div>
-            <div className="member-certificate-skills">
-              <span className="member-skill-tag">Coding</span>
-              <span className="member-skill-tag">Innovation</span>
-              <span className="member-skill-tag">Teamwork</span>
+            <div className="sm-certificate-skills">
+              <span className="sm-skill-tag">Problem Solving</span>
+              <span className="sm-skill-tag">Team Collaboration</span>
+              <span className="sm-skill-tag">Innovation</span>
             </div>
-            <div className="member-certificate-id">
-              Certificate ID: CERT-2024-001
+            <div className="sm-certificate-id">
+              Certificate ID: CERT-HAK-2024-001
             </div>
           </div>
-          <div className="member-certificate-actions">
-            <button className="member-btn-primary">
-              <Download size={14} />
+          <div className="sm-certificate-actions">
+            <button className="sm-btn-primary">
+              <Download size={16} />
               Download
             </button>
           </div>
         </div>
 
-        <div className="member-certificate-card">
-          <div className="member-certificate-header">
-            <Award size={24} className="member-certificate-icon" />
-            <span className="member-certificate-badge">Verified</span>
+        <div className="sm-certificate-card">
+          <div className="sm-certificate-header">
+            <div className="sm-certificate-icon">
+              <Award size={32} />
+            </div>
+            <span className="sm-certificate-badge verified">Verified</span>
           </div>
-          <div className="member-certificate-content">
-            <h3>Tech Talk Series Attendee</h3>
-            <div className="member-certificate-details">
-              <div className="member-detail-item">
-                <Calendar size={14} />
+          <div className="sm-certificate-content">
+            <h3>AI/ML Workshop Completion</h3>
+            <div className="sm-certificate-details">
+              <div className="sm-detail-item">
+                <Calendar size={16} />
                 <span>November 20, 2023</span>
               </div>
-              <div className="member-detail-item">
-                <User size={14} />
+              <div className="sm-detail-item">
+                <User size={16} />
                 <span>ABC Society</span>
               </div>
             </div>
-            <div className="member-certificate-skills">
-              <span className="member-skill-tag">AI/ML</span>
-              <span className="member-skill-tag">Learning</span>
+            <div className="sm-certificate-skills">
+              <span className="sm-skill-tag">Machine Learning</span>
+              <span className="sm-skill-tag">Data Science</span>
             </div>
-            <div className="member-certificate-id">
-              Certificate ID: CERT-2023-045
+            <div className="sm-certificate-id">
+              Certificate ID: CERT-WRK-2023-045
             </div>
           </div>
-          <div className="member-certificate-actions">
-            <button className="member-btn-primary">
-              <Download size={14} />
+          <div className="sm-certificate-actions">
+            <button className="sm-btn-primary">
+              <Download size={16} />
               Download
             </button>
           </div>
@@ -524,84 +564,82 @@ const SocietyMember = ({ setCurrentPage }) => {
   );
 
   const renderChat = () => (
-    <div className="member-dashboard-content">
-      <div className="member-content-header">
-        <div className="member-header-left">
+    <div className="sm-dashboard-content">
+      <div className="sm-content-header">
+        <div className="sm-header-left">
           <h2>AI Assistant & Group Chat</h2>
-          <p>Get insights and connect with members</p>
+          <p>Get personalized insights and connect with members</p>
         </div>
       </div>
 
-      <div className="member-dashboard-grid">
-        <div className="member-dashboard-card">
-          <div className="member-card-header">
+      <div className="sm-chat-grid">
+        <div className="sm-chat-container">
+          <div className="sm-chat-header">
             <h3><Brain size={20} /> AI Assistant</h3>
+            <span className="sm-status-indicator online">Online</span>
           </div>
-          <div className="member-chat-container">
-            <div className="member-chat-messages">
-              {chatMessages.map(msg => (
-                <div key={msg.id} className={`member-chat-message ${msg.isBot ? 'bot-message' : 'user-message'}`}>
-                  <div className="member-message-avatar">
-                    {msg.isBot ? 'AI' : 'YU'}
-                  </div>
-                  <div className="member-message-content">
-                    <div className="member-message-header">
-                      <span className="member-message-user">{msg.user}</span>
-                      <span className="member-message-time">{msg.time}</span>
-                    </div>
-                    <div className="member-message-text">{msg.message}</div>
-                  </div>
+          <div className="sm-chat-messages">
+            {chatMessages.map(msg => (
+              <div key={msg.id} className={`sm-chat-message ${msg.isBot ? 'bot-message' : 'user-message'}`}>
+                <div className="sm-message-avatar">
+                  {msg.isBot ? <Brain size={20} /> : 'YU'}
                 </div>
-              ))}
-            </div>
-            <div className="member-chat-input">
-              <input
-                type="text"
-                placeholder="Ask about your progress, society insights..."
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage(false)}
-              />
-              <button className="member-send-btn" onClick={() => handleSendMessage(false)}>
-                <Send size={16} />
-              </button>
-            </div>
+                <div className="sm-message-content">
+                  <div className="sm-message-header">
+                    <span className="sm-message-user">{msg.user}</span>
+                    <span className="sm-message-time">{msg.time}</span>
+                  </div>
+                  <div className="sm-message-text">{msg.message}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="sm-chat-input">
+            <input
+              type="text"
+              placeholder="Ask about your progress, society insights..."
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage(false)}
+            />
+            <button className="sm-send-btn" onClick={() => handleSendMessage(false)}>
+              <Send size={18} />
+            </button>
           </div>
         </div>
 
-        <div className="member-dashboard-card">
-          <div className="member-card-header">
-            <h3><MessageCircle size={20} /> Group Chat</h3>
+        <div className="sm-chat-container">
+          <div className="sm-chat-header">
+            <h3><MessageCircle size={20} /> Group Discussion</h3>
+            <span className="sm-status-indicator online">{groupChatMessages.length} messages</span>
           </div>
-          <div className="member-chat-container">
-            <div className="member-chat-messages">
-              {groupChatMessages.map(msg => (
-                <div key={msg.id} className={`member-chat-message ${msg.user === 'You' ? 'user-message' : ''}`}>
-                  <div className="member-message-avatar">
-                    {msg.avatar}
-                  </div>
-                  <div className="member-message-content">
-                    <div className="member-message-header">
-                      <span className="member-message-user">{msg.user}</span>
-                      <span className="member-message-time">{msg.time}</span>
-                    </div>
-                    <div className="member-message-text">{msg.message}</div>
-                  </div>
+          <div className="sm-chat-messages">
+            {groupChatMessages.map(msg => (
+              <div key={msg.id} className={`sm-chat-message ${msg.user === 'You' ? 'user-message' : ''}`}>
+                <div className="sm-message-avatar">
+                  {msg.avatar}
                 </div>
-              ))}
-            </div>
-            <div className="member-chat-input">
-              <input
-                type="text"
-                placeholder="Message the group..."
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage(true)}
-              />
-              <button className="member-send-btn" onClick={() => handleSendMessage(true)}>
-                <Send size={16} />
-              </button>
-            </div>
+                <div className="sm-message-content">
+                  <div className="sm-message-header">
+                    <span className="sm-message-user">{msg.user}</span>
+                    <span className="sm-message-time">{msg.time}</span>
+                  </div>
+                  <div className="sm-message-text">{msg.message}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="sm-chat-input">
+            <input
+              type="text"
+              placeholder="Message the group..."
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage(true)}
+            />
+            <button className="sm-send-btn" onClick={() => handleSendMessage(true)}>
+              <Send size={18} />
+            </button>
           </div>
         </div>
       </div>
@@ -609,82 +647,84 @@ const SocietyMember = ({ setCurrentPage }) => {
   );
 
   return (
-    <div className="member-society-container">
+    <div className="sm-container">
       {showSuccess && (
-        <div className="success-message">
-          <CheckCircle size={20} />
+        <div className="sm-success-message">
+          <CheckCircle size={22} />
           <span>{successMessage}</span>
         </div>
       )}
 
-      <header className="member-society-header">
-        <div className="member-header-left">
+      <header className="sm-header">
+        <div className="sm-header-left">
           <button 
             onClick={() => setCurrentPage('getstarted')} 
-            className="member-back-button"
+            className="sm-back-button"
           >
-            <ArrowLeft size={20} />
+            <ArrowLeft size={22} />
           </button>
-          <div className="member-society-info">
+          <div className="sm-society-info">
             <h1>ABC SOCIETY</h1>
-            <p>Welcome back, {memberData.name} • {memberData.role}</p>
+            <p>Welcome back, <strong>{memberData.name}</strong> • {memberData.role}</p>
           </div>
         </div>
-        <div className="member-header-right">
+        <div className="sm-header-right">
           <button 
-            className="member-notification-btn"
+            className="sm-notification-btn"
             onClick={() => openModal('notifications')}
           >
-            <Bell size={20} />
-            <span className="member-notification-badge">
-              {notifications.filter(n => !n.read).length}
-            </span>
+            <Bell size={22} />
+            {notifications.filter(n => !n.read).length > 0 && (
+              <span className="sm-notification-badge">
+                {notifications.filter(n => !n.read).length}
+              </span>
+            )}
           </button>
-          <div className="member-profile-avatar">
-            AJ
+          <div className="sm-profile-avatar">
+            {memberData.name.split(' ').map(n => n[0]).join('')}
           </div>
         </div>
       </header>
 
-      <nav className="member-society-nav">
+      <nav className="sm-nav">
         <button 
-          className={`member-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
+          className={`sm-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
           onClick={() => setActiveTab('dashboard')}
         >
-          <Activity size={16} />
+          <Activity size={18} />
           Dashboard
         </button>
         <button 
-          className={`member-nav-item ${activeTab === 'events' ? 'active' : ''}`}
+          className={`sm-nav-item ${activeTab === 'events' ? 'active' : ''}`}
           onClick={() => setActiveTab('events')}
         >
-          <Calendar size={16} />
+          <Calendar size={18} />
           Events
         </button>
         <button 
-          className={`member-nav-item ${activeTab === 'members' ? 'active' : ''}`}
+          className={`sm-nav-item ${activeTab === 'members' ? 'active' : ''}`}
           onClick={() => setActiveTab('members')}
         >
-          <Users size={16} />
+          <Users size={18} />
           Members
         </button>
         <button 
-          className={`member-nav-item ${activeTab === 'certificates' ? 'active' : ''}`}
+          className={`sm-nav-item ${activeTab === 'certificates' ? 'active' : ''}`}
           onClick={() => setActiveTab('certificates')}
         >
-          <Award size={16} />
+          <Award size={18} />
           Certificates
         </button>
         <button 
-          className={`member-nav-item ${activeTab === 'chat' ? 'active' : ''}`}
+          className={`sm-nav-item ${activeTab === 'chat' ? 'active' : ''}`}
           onClick={() => setActiveTab('chat')}
         >
-          <MessageCircle size={16} />
-          Chat & AI
+          <MessageCircle size={18} />
+          AI & Chat
         </button>
       </nav>
 
-      <main className="member-society-main">
+      <main className="sm-main">
         {activeTab === 'dashboard' && renderDashboard()}
         {activeTab === 'events' && renderEvents()}
         {activeTab === 'members' && renderMembers()}
@@ -693,67 +733,73 @@ const SocietyMember = ({ setCurrentPage }) => {
       </main>
 
       {isModalOpen && (
-        <div className="member-modal-backdrop">
-          <div ref={modalRef} className="member-modal-content">
-            <div className="member-modal-header">
+        <div className="sm-modal-backdrop">
+          <div ref={modalRef} className="sm-modal-content">
+            <div className="sm-modal-header">
               <h2>
                 {modalType === 'notifications' && 'Notifications'}
-                {modalType === 'aiInsights' && 'AI Insights'}
-                {modalType === 'certificate' && 'Generate Certificate'}
+                {modalType === 'aiInsights' && 'AI Insights & Analytics'}
+                {modalType === 'certificate' && 'Certificate Generator'}
                 {modalType === 'reminder' && 'Set Event Reminder'}
                 {modalType === 'sendMessage' && 'Send Message'}
                 {modalType === 'suggestEvent' && 'Suggest Event'}
-              </h2>
-              <button onClick={closeModal} className="member-modal-close-button">
-                <X size={20} />
+</h2>
+              <button onClick={closeModal} className="sm-modal-close-button">
+                <X size={22} />
               </button>
             </div>
 
-            <div className="member-modal-body">
+            <div className="sm-modal-body">
               {modalType === 'notifications' && (
-                <div className="notifications-list">
+                <div className="sm-notifications-list">
                   {notifications.map(notif => (
                     <div 
                       key={notif.id} 
-                      className={`notification-item ${notif.read ? 'read' : 'unread'}`}
+                      className={`sm-notification-item ${notif.read ? 'read' : 'unread'}`}
                       onClick={() => markNotificationAsRead(notif.id)}
                     >
-                      <div className={`notification-icon ${notif.type}`}>
-                        {notif.type === 'reminder' ? <Clock size={16} /> :
-                         notif.type === 'achievement' ? <Trophy size={16} /> :
-                         <Bell size={16} />}
+                      <div className={`sm-notification-icon ${notif.type}`}>
+                        {notif.type === 'reminder' ? <Clock size={18} /> :
+                         notif.type === 'achievement' ? <Trophy size={18} /> :
+                         <Bell size={18} />}
                       </div>
-                      <div className="notification-content">
+                      <div className="sm-notification-content">
                         <h4>{notif.title}</h4>
                         <p>{notif.message}</p>
-                        <span className="notification-time">{notif.time}</span>
+                        <span className="sm-notification-time">{notif.time}</span>
                       </div>
-                      {!notif.read && <div className="notification-dot"></div>}
+                      {!notif.read && <div className="sm-notification-dot"></div>}
                     </div>
                   ))}
                 </div>
               )}
 
               {modalType === 'aiInsights' && (
-                <div className="ai-insights-modal">
-                  <div className="insight-section">
-                    <h3><Target size={20} /> Personal Insights</h3>
-                    <div className="insight-cards">
+                <div className="sm-ai-insights-modal">
+                  <div className="sm-insight-section">
+                    <h3><Target size={22} /> Personal Performance Analytics</h3>
+                    <div className="sm-insight-cards">
                       {aiInsights.personal.map((insight, index) => (
-                        <div key={index} className="insight-card">
-                          <h4>Performance Update</h4>
+                        <div key={index} className="sm-insight-card">
+                          <div className="sm-insight-card-header">
+                            <Zap size={18} />
+                            <h4>Performance Insight #{index + 1}</h4>
+                          </div>
                           <p>{insight}</p>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  <div className="insight-section">
-                    <h3><TrendingUp size={20} /> Society Insights</h3>
-                    <div className="insight-cards">
+                  <div className="sm-insight-section">
+                    <h3><TrendingUp size={22} /> Society-wide Analytics</h3>
+                    <div className="sm-insight-cards">
                       {aiInsights.society.map((insight, index) => (
-                        <div key={index} className="insight-card">
-                          <h4>Society Analytics</h4>
+                        <div key={index} className="sm-insight-card">
+                          <div className="sm-insight-card-header">
+                            <Activity size={18} />
+                            <h4>Society Metric #{index + 1}</h4>
+                          </div>
                           <p>{insight}</p>
                         </div>
                       ))}
@@ -763,109 +809,160 @@ const SocietyMember = ({ setCurrentPage }) => {
               )}
 
               {modalType === 'certificate' && (
-                <div className="certificate-generator">
-                  {certificateStep === 1 && (
-                    <>
-                      <h3>Which event would you like a certificate for?</h3>
-                      <div className="certificate-events">
-                        {events.filter(e => e.status === 'completed').map(event => (
-                          <button
-                            key={event.id}
-                            className={`certificate-event-btn ${certificateData.event === event.title ? 'selected' : ''}`}
-                            onClick={() => setCertificateData({...certificateData, event: event.title})}
-                          >
-                            <Calendar size={16} />
-                            <span>{event.title}</span>
-                          </button>
-                        ))}
+                <div className="sm-certificate-generator">
+                  <div className="sm-certificate-form">
+                    <h3><Award size={24} /> Certificate Generation Form</h3>
+                    <p className="sm-form-description">Fill in the details to generate your personalized certificate</p>
+                    
+                    <div className="sm-form-grid">
+                      <div className="sm-form-group">
+                        <label>Event/Workshop Title *</label>
+                        <input
+                          type="text"
+                          className="sm-form-input"
+                          placeholder="e.g., AI/ML Workshop 2024"
+                          value={certificateForm.eventTitle}
+                          onChange={(e) => setCertificateForm({...certificateForm, eventTitle: e.target.value})}
+                        />
                       </div>
-                      <button 
-                        className="member-btn-primary"
-                        onClick={handleGenerateCertificate}
-                        disabled={!certificateData.event}
-                      >
-                        Next
-                      </button>
-                    </>
-                  )}
 
-                  {certificateStep === 2 && (
-                    <>
-                      <h3>What achievements should be mentioned?</h3>
+                      <div className="sm-form-group">
+                        <label>Participant Name *</label>
+                        <input
+                          type="text"
+                          className="sm-form-input"
+                          value={certificateForm.participantName}
+                          onChange={(e) => setCertificateForm({...certificateForm, participantName: e.target.value})}
+                        />
+                      </div>
+
+                      <div className="sm-form-group">
+                        <label>Date of Completion *</label>
+                        <input
+                          type="date"
+                          className="sm-form-input"
+                          value={certificateForm.dateOfCompletion}
+                          onChange={(e) => setCertificateForm({...certificateForm, dateOfCompletion: e.target.value})}
+                        />
+                      </div>
+
+                      <div className="sm-form-group">
+                        <label>Certificate Type</label>
+                        <select
+                          className="sm-form-select"
+                          value={certificateForm.certificateType}
+                          onChange={(e) => setCertificateForm({...certificateForm, certificateType: e.target.value})}
+                        >
+                          <option value="participation">Participation Certificate</option>
+                          <option value="completion">Completion Certificate</option>
+                          <option value="achievement">Achievement Certificate</option>
+                          <option value="excellence">Excellence Award</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="sm-form-group sm-full-width">
+                      <label>Key Achievements & Learning Outcomes *</label>
                       <textarea
-                        className="certificate-input"
-                        placeholder="e.g., Participated in coding challenges, demonstrated teamwork skills, completed project successfully..."
-                        value={certificateData.achievements}
-                        onChange={(e) => setCertificateData({...certificateData, achievements: e.target.value})}
+                        className="sm-form-textarea"
+                        placeholder="Describe what you accomplished, learned, or contributed during this event..."
+                        value={certificateForm.achievements}
+                        onChange={(e) => setCertificateForm({...certificateForm, achievements: e.target.value})}
                         rows={4}
                       />
-                      <div className="certificate-actions">
-                        <button 
-                          className="member-btn-secondary"
-                          onClick={() => setCertificateStep(1)}
-                        >
-                          Back
-                        </button>
-                        <button 
-                          className="member-btn-primary"
-                          onClick={handleGenerateCertificate}
-                          disabled={!certificateData.achievements}
-                        >
-                          Generate Certificate
-                        </button>
-                      </div>
-                    </>
-                  )}
+                    </div>
+
+                    <div className="sm-form-group sm-full-width">
+                      <label>Skills Gained/Demonstrated</label>
+                      <input
+                        type="text"
+                        className="sm-form-input"
+                        placeholder="e.g., Python Programming, Team Leadership, Problem Solving"
+                        value={certificateForm.skillsGained}
+                        onChange={(e) => setCertificateForm({...certificateForm, skillsGained: e.target.value})}
+                      />
+                    </div>
+
+                    <div className="sm-form-group sm-full-width">
+                      <label>Additional Notes (Optional)</label>
+                      <textarea
+                        className="sm-form-textarea"
+                        placeholder="Any additional information or special recognition..."
+                        value={certificateForm.customMessage}
+                        onChange={(e) => setCertificateForm({...certificateForm, customMessage: e.target.value})}
+                        rows={3}
+                      />
+                    </div>
+
+                    <div className="sm-certificate-actions">
+                      <button 
+                        className="sm-btn-secondary"
+                        onClick={closeModal}
+                      >
+                        Cancel
+                      </button>
+                      <button 
+                        className="sm-btn-primary"
+                        onClick={handleGenerateCertificate}
+                      >
+                        <Award size={16} />
+                        Generate Certificate
+                      </button>
+                    </div>
+                  </div>
                 </div>
               )}
 
               {modalType === 'reminder' && selectedEvent && (
-                <div className="reminder-setup">
-                  <div className="reminder-event-info">
-                    <h3>{selectedEvent.title}</h3>
-                    <div className="reminder-event-details">
-                      <div className="reminder-detail">
-                        <Calendar size={16} />
-                        <span>{new Date(selectedEvent.date).toLocaleDateString()}</span>
+                <div className="sm-reminder-setup">
+                  <div className="sm-reminder-event-info">
+                    <div className="sm-event-header">
+                      <Calendar size={24} />
+                      <h3>{selectedEvent.title}</h3>
+                    </div>
+                    <div className="sm-reminder-details">
+                      <div className="sm-reminder-detail">
+                        <Clock size={18} />
+                        <span>{new Date(selectedEvent.date).toLocaleDateString()} at {selectedEvent.time}</span>
                       </div>
-                      <div className="reminder-detail">
-                        <Clock size={16} />
-                        <span>{selectedEvent.time}</span>
-                      </div>
-                      <div className="reminder-detail">
-                        <MapPin size={16} />
+                      <div className="sm-reminder-detail">
+                        <MapPin size={18} />
                         <span>{selectedEvent.venue}</span>
+                      </div>
+                      <div className="sm-reminder-detail">
+                        <Users size={18} />
+                        <span>{selectedEvent.attendees} attendees registered</span>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="reminder-options">
-                    <h4>When would you like to be reminded?</h4>
-                    <div className="reminder-time-options">
-                      <button className="reminder-option selected">
+                  <div className="sm-reminder-options">
+                    <h4>Reminder Settings</h4>
+                    <div className="sm-reminder-time-options">
+                      <button className="sm-reminder-option selected">
                         <Clock size={16} />
                         <span>1 hour before</span>
                       </button>
-                      <button className="reminder-option">
+                      <button className="sm-reminder-option">
                         <Clock size={16} />
                         <span>1 day before</span>
                       </button>
-                      <button className="reminder-option">
+                      <button className="sm-reminder-option">
                         <Clock size={16} />
                         <span>1 week before</span>
                       </button>
                     </div>
                   </div>
 
-                  <div className="reminder-actions">
+                  <div className="sm-reminder-actions">
                     <button 
-                      className="member-btn-secondary"
+                      className="sm-btn-secondary"
                       onClick={closeModal}
                     >
                       Cancel
                     </button>
                     <button 
-                      className="member-btn-primary"
+                      className="sm-btn-primary"
                       onClick={() => handleSetReminder(selectedEvent)}
                     >
                       <Bell size={16} />
@@ -876,38 +973,38 @@ const SocietyMember = ({ setCurrentPage }) => {
               )}
 
               {modalType === 'sendMessage' && selectedMember && (
-                <div className="send-message-modal">
-                  <div className="message-recipient">
-                    <div className="recipient-avatar">
+                <div className="sm-send-message-modal">
+                  <div className="sm-message-recipient">
+                    <div className="sm-recipient-avatar">
                       {selectedMember.name.split(' ').map(n => n[0]).join('')}
                     </div>
-                    <div className="recipient-info">
+                    <div className="sm-recipient-info">
                       <h4>{selectedMember.name}</h4>
-                      <span>{selectedMember.role} • {selectedMember.department}</span>
-                      <span>{selectedMember.email}</span>
+                      <span className="sm-recipient-role">{selectedMember.role} • {selectedMember.department}</span>
+                      <span className="sm-recipient-email">{selectedMember.email}</span>
                     </div>
                   </div>
                   
-                  <div className="message-input-section">
+                  <div className="sm-message-input-section">
                     <label>Your Message</label>
                     <textarea
-                      className="message-textarea"
+                      className="sm-message-textarea"
                       placeholder="Type your message here..."
                       value={messageText}
                       onChange={(e) => setMessageText(e.target.value)}
-                      rows={4}
+                      rows={6}
                     />
                   </div>
 
-                  <div className="message-actions">
+                  <div className="sm-message-actions">
                     <button 
-                      className="member-btn-secondary"
+                      className="sm-btn-secondary"
                       onClick={closeModal}
                     >
                       Cancel
                     </button>
                     <button 
-                      className="member-btn-primary"
+                      className="sm-btn-primary"
                       onClick={() => handleSendMessage(false, selectedMember)}
                       disabled={!messageText.trim()}
                     >
@@ -919,61 +1016,65 @@ const SocietyMember = ({ setCurrentPage }) => {
               )}
 
               {modalType === 'suggestEvent' && (
-                <div className="event-suggestion-modal">
-                  <h3>Suggest a New Event</h3>
-                  <p>Share your ideas for upcoming society events</p>
+                <div className="sm-event-suggestion-modal">
+                  <div className="sm-suggestion-header">
+                    <Sparkles size={24} />
+                    <h3>Suggest a New Event</h3>
+                    <p>Help us create engaging experiences for our society members</p>
+                  </div>
                   
-                  <div className="suggestion-form">
-                    <div className="form-group">
-                      <label>Event Category</label>
+                  <div className="sm-suggestion-form">
+                    <div className="sm-form-group">
+                      <label>Event Category *</label>
                       <select 
-                        className="suggestion-select"
+                        className="sm-form-select"
                         value={eventSuggestionCategory}
                         onChange={(e) => setEventSuggestionCategory(e.target.value)}
                       >
                         <option value="">Select Category</option>
-                        <option value="workshop">Workshop</option>
-                        <option value="seminar">Seminar</option>
+                        <option value="workshop">Technical Workshop</option>
+                        <option value="seminar">Educational Seminar</option>
                         <option value="competition">Competition</option>
                         <option value="hackathon">Hackathon</option>
                         <option value="networking">Networking Event</option>
                         <option value="cultural">Cultural Event</option>
-                        <option value="sports">Sports Event</option>
+                        <option value="sports">Sports Activity</option>
                         <option value="community-service">Community Service</option>
                       </select>
                     </div>
                     
-                    <div className="form-group">
-                      <label>Event Suggestion</label>
+                    <div className="sm-form-group sm-full-width">
+                      <label>Event Suggestion & Details *</label>
                       <textarea
-                        className="suggestion-textarea"
-                        placeholder="Describe your event idea, including potential topics, format, expected outcomes, and why it would benefit society members..."
+                        className="sm-form-textarea"
+                        placeholder="Describe your event idea in detail - include potential topics, format, expected outcomes, target audience, and how it would benefit society members..."
                         value={eventSuggestion}
                         onChange={(e) => setEventSuggestion(e.target.value)}
-                        rows={5}
+                        rows={8}
                       />
                     </div>
                     
-                    <div className="suggestion-tips">
-                      <h5>Tips for great suggestions:</h5>
+                    <div className="sm-suggestion-tips">
+                      <h5><BookOpen size={18} /> Tips for Great Suggestions</h5>
                       <ul>
-                        <li>Be specific about the event format and content</li>
-                        <li>Mention potential speakers or facilitators</li>
-                        <li>Explain how it aligns with society goals</li>
-                        <li>Consider the target audience and skill level</li>
+                        <li>Be specific about the event format and content structure</li>
+                        <li>Mention potential speakers, facilitators, or industry experts</li>
+                        <li>Explain how it aligns with our society's mission and goals</li>
+                        <li>Consider the target audience and appropriate skill levels</li>
+                        <li>Include potential partnerships or sponsorship opportunities</li>
                       </ul>
                     </div>
                   </div>
 
-                  <div className="suggestion-actions">
+                  <div className="sm-suggestion-actions">
                     <button 
-                      className="member-btn-secondary"
+                      className="sm-btn-secondary"
                       onClick={closeModal}
                     >
                       Cancel
                     </button>
                     <button 
-                      className="member-btn-primary"
+                      className="sm-btn-primary"
                       onClick={handleSuggestEvent}
                       disabled={!eventSuggestion.trim() || !eventSuggestionCategory}
                     >
