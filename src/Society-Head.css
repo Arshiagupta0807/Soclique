@@ -65,7 +65,8 @@
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
-  width: 100vw;
+  width: 99lvw;
+  margin-top: 40px;
 }
 
 .sh-container::before {
