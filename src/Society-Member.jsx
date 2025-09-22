@@ -73,7 +73,7 @@ const SocietyMember = ({ setCurrentPage }) => {
   const modalRef = useRef(null);
 
   const memberData = {
-    name: "Alex Johnson",
+    name: "Arshia Gupta",
     id: "MS2024001",
     role: "Active Member",
     department: "Computer Science",

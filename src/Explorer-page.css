@@ -314,7 +314,7 @@ body {
   background: rgba(179, 207, 229, 0.08);
   border: 2px solid rgba(179, 207, 229, 0.15);
   border-radius: var(--radius-full);
-  color: var(--text-primary);
+  color: black;
   font-size: 1rem;
   font-weight: 500;
   outline: none;

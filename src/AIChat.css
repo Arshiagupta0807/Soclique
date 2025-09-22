@@ -307,7 +307,7 @@
   backdrop-filter: blur(10px);
   font-family: 'Inter', sans-serif;
   font-size: 0.95rem;
-  color: var(--chat-text-primary);
+  color: black;
   resize: none;
   outline: none;
   transition: var(--chat-transition-fast);
@@ -316,7 +316,7 @@
 }
 
 .chat-input::placeholder {
-  color: var(--chat-text-secondary);
+  color: black;
   opacity: 1;
 }
 
